@@ -21,8 +21,8 @@ This free CLI tool saves you from LLM downtime. For teams needing:
 - **Usage analytics dashboard**
 - **Private hosting** options
 
-👉 **Contact:** your-email@example.com for enterprise pricing
-👉 **Sponsor:** [GitHub Sponsors](https://github.com/sponsors/yourusername)
+👉 **Contact:** jasonclarkagain@gmail.com for enterprise pricing
+👉 **Sponsor:** https://github.com/sponsors/jasonclarkagain
 
 **Free tier** = This CLI • **Paid tier** = +Security templates +Dashboard +Priority
 
@@ -35,8 +35,8 @@ This free CLI tool saves you from LLM downtime. For teams needing:
 - **Usage analytics dashboard**
 - **Private hosting** options
 
-👉 **Contact:** your-email@example.com for enterprise pricing
-👉 **Sponsor:** [GitHub Sponsors](https://github.com/sponsors/yourusername)
+👉 Contact: jasonclarkagain@gmail.com for enterprise pricing
+👉 Sponsor: https://github.com/sponsors/jasonclarkagain
 
 **Free tier** = This CLI • **Paid tier** = +Security templates +Dashboard +Priority
 
@@ -49,4 +49,4 @@ As a member of the **GitHub Developer Program**, ParallelAI can integrate with:
 - **GitHub Actions**: CI/CD security scanning
 - **Enterprise Server**: On-premise deployment options
 
-**Interested in GitHub integration?** Contact: your-email@example.com
+**Interested in GitHub integration?** Contact: jasonclarkagain@gmail.com
