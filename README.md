@@ -25,3 +25,17 @@ This free CLI tool saves you from LLM downtime. For teams needing:
 👉 **Sponsor:** [GitHub Sponsors](https://github.com/sponsors/yourusername)
 
 **Free tier** = This CLI • **Paid tier** = +Security templates +Dashboard +Priority
+
+## 💰 Support & Premium Version
+
+This free CLI tool saves you from LLM downtime. For teams needing:
+
+- **Priority support** & custom integrations
+- **Advanced security features** (malware analysis templates)
+- **Usage analytics dashboard**
+- **Private hosting** options
+
+👉 **Contact:** your-email@example.com for enterprise pricing
+👉 **Sponsor:** [GitHub Sponsors](https://github.com/sponsors/yourusername)
+
+**Free tier** = This CLI • **Paid tier** = +Security templates +Dashboard +Priority
