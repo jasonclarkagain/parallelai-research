@@ -1,0 +1,171 @@
+#!/usr/bin/env python3
+"""
+ParallelAI Simple CLI - Reliable multi-provider AI assistant
+Improved version with automatic .env loading
+"""
+import os
+import sys
+import json
+import requests
+from pathlib import Path
+from typing import Optional, Dict
+
+class SimpleParallelAI:
+    def __init__(self):
+        # Try to load .env file automatically
+        self.load_env_vars()
+        self.setup_providers()
+    
+    def load_env_vars(self):
+        """Try to load environment variables from .env file"""
+        env_file = Path(".env")
+        if env_file.exists():
+            print("📁 Loading environment from .env file...", file=sys.stderr)
+            with open(env_file) as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#') and '=' in line:
+                        key, value = line.split('=', 1)
+                        # Remove quotes if present
+                        value = value.strip().strip('"').strip("'")
+                        os.environ[key.strip()] = value
+        
+        # Also check for ~/projects/parallelai/.env
+        home_env = Path.home() / "projects" / "parallelai" / ".env"
+        if home_env.exists() and not env_file.exists():
+            print(f"📁 Loading environment from {home_env}...", file=sys.stderr)
+            with open(home_env) as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#') and '=' in line:
+                        key, value = line.split('=', 1)
+                        value = value.strip().strip('"').strip("'")
+                        os.environ[key.strip()] = value
+    
+    def setup_providers(self):
+        self.providers = [
+            {
+                'name': 'groq',
+                'url': 'https://api.groq.com/openai/v1/chat/completions',
+                'key': os.getenv('GROQ_API_KEY'),
+                'model': 'llama-3.3-70b-versatile',
+                'headers': lambda key: {
+                    'Authorization': f'Bearer {key}',
+                    'Content-Type': 'application/json'
+                }
+            },
+            {
+                'name': 'together',
+                'url': 'https://api.together.xyz/v1/chat/completions',
+                'key': os.getenv('TOGETHER_API_KEY'),
+                'model': 'mistralai/Mixtral-8x7B-Instruct-v0.1',
+                'headers': lambda key: {
+                    'Authorization': f'Bearer {key}',
+                    'Content-Type': 'application/json'
+                }
+            },
+            {
+                'name': 'openrouter',
+                'url': 'https://openrouter.ai/api/v1/chat/completions',
+                'key': os.getenv('OPENROUTER_API_KEY'),
+                'model': 'mistralai/mistral-7b-instruct:free',
+                'headers': lambda key: {
+                    'Authorization': f'Bearer {key}',
+                    'HTTP-Referer': 'https://parallelai.com',
+                    'X-Title': 'ParallelAI Tool',
+                    'Content-Type': 'application/json'
+                }
+            }
+        ]
+    
+    def query(self, prompt: str, max_tokens: int = 300) -> Dict:
+        """Try providers sequentially until one works"""
+        for provider in self.providers:
+            if not provider['key'] or len(provider['key']) < 20:
+                print(f"Skipping {provider['name']} - no valid API key", file=sys.stderr)
+                continue
+            
+            print(f"Trying {provider['name']}...", file=sys.stderr)
+            
+            try:
+                headers = provider['headers'](provider['key'])
+                payload = {
+                    'model': provider['model'],
+                    'messages': [{'role': 'user', 'content': prompt}],
+                    'max_tokens': max_tokens,
+                    'temperature': 0.7
+                }
+                
+                response = requests.post(
+                    provider['url'],
+                    json=payload,
+                    headers=headers,
+                    timeout=15
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    content = data.get('choices', [{}])[0].get('message', {}).get('content', '')
+                    
+                    return {
+                        'success': True,
+                        'provider': provider['name'],
+                        'model': provider['model'],
+                        'response': content
+                    }
+                else:
+                    print(f"  {provider['name']} failed: HTTP {response.status_code}", file=sys.stderr)
+                    
+            except Exception as e:
+                print(f"  {provider['name']} error: {str(e)[:50]}", file=sys.stderr)
+                continue
+        
+        return {'success': False, 'error': 'All providers failed'}
+
+def print_help():
+    print("""
+ParallelAI Simple CLI - v1.1 (Auto .env loader)
+===============================================
+
+Simple, reliable AI assistant using multiple providers with fallback.
+
+Usage:
+  parallelai-simple "your query"          # Fast (uses first working provider)
+  parallelai-simple --all "your query"    # Get responses from all providers
+
+Examples:
+  parallelai-simple "Explain DNS"
+  parallelai-simple --all "Write a Python function"
+  parallelai-simple "What is machine learning?"
+
+The script automatically loads API keys from:
+  1. .env file in current directory
+  2. ~/projects/parallelai/.env
+""")
+
+def main():
+    if len(sys.argv) < 2 or sys.argv[1] in ['--help', '-h']:
+        print_help()
+        return
+    
+    prompt = ' '.join(sys.argv[1:])
+    print(f"🔍 Query: {prompt}")
+    print("⚡ Finding fastest working provider...\n")
+    
+    client = SimpleParallelAI()
+    result = client.query(prompt)
+    
+    if result['success']:
+        print(f"✅ {result['provider'].upper()} ({result['model']}):")
+        print(f"\n{result['response']}")
+        print(f"\n📊 Source: {result['provider']}")
+    else:
+        print(f"❌ Error: {result.get('error', 'All providers failed')}")
+        print("\n💡 Troubleshooting:")
+        print("  1. Check .env file exists and has valid API keys")
+        print("  2. Keys should be >20 characters each")
+        print("  3. Run: source .env  (to load keys manually)")
+        print("  4. Test with: python3 -c \"import os; print('Keys loaded:', 'GROQ_API_KEY' in os.environ)\"")
+
+if __name__ == "__main__":
+    main()

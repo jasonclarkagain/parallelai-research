@@ -1,0 +1,19 @@
+#!/bin/bash
+# ParallelAI Project Activation Script
+cd ~/projects/parallelai
+
+# Mount vault if needed
+if ! mountpoint -q ~/Vault; then
+    echo "🔐 Mounting encrypted vault..."
+    vaultctl mount
+fi
+
+# Load environment
+source .env
+source venv/bin/activate
+
+echo "✅ ParallelAI Project Activated"
+echo "   Directory: $(pwd)"
+echo "   Python: $(python --version 2>&1)"
+echo "   Virtual Environment: $(which python)"
+echo "   Keys Loaded: GROQ, Together AI, OpenRouter"
