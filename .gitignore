@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.env
+.venv
+
+# API Keys & Secrets - CRITICAL
+.env
+*.key
+*.pem
+credentials.json
+
+# System
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Project specific
+test_*.py
+*-fixed
+*-simple
+check_*.sh
+
+# Secret files and backups
+.env
+.env.*
+*.backup
+*_backup
+secrets.txt
+credentials.json
