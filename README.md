@@ -39,3 +39,14 @@ This free CLI tool saves you from LLM downtime. For teams needing:
 👉 **Sponsor:** [GitHub Sponsors](https://github.com/sponsors/yourusername)
 
 **Free tier** = This CLI • **Paid tier** = +Security templates +Dashboard +Priority
+
+## 🔗 GitHub Integration (Developer Program)
+
+As a member of the **GitHub Developer Program**, ParallelAI can integrate with:
+
+- **GitHub Issues**: AI-powered security issue triage
+- **Pull Requests**: Automated security code review
+- **GitHub Actions**: CI/CD security scanning
+- **Enterprise Server**: On-premise deployment options
+
+**Interested in GitHub integration?** Contact: your-email@example.com
