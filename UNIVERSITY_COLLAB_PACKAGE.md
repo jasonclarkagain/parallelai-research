@@ -18,4 +18,4 @@
 ## Contact
 Jason Clark
 ORCID: 0009-0005-3020-9694
-GitHub: jasonclarkagain/parallelai
+GitHub: jasonclarkagain/parallelai-research
