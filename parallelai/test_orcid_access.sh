@@ -1,0 +1,11 @@
+#!/bin/bash
+echo "Testing ORCID access..."
+echo "Your ORCID: 0009-0005-3020-9694"
+echo ""
+echo "1. Open browser to: https://orcid.org"
+echo "2. Login with your credentials"
+echo "3. After login, URL should contain '/0009-0005-3020-9694'"
+echo "4. If not, check:"
+echo "   - Are you logged into correct account?"
+echo "   - Try: https://orcid.org/signin"
+echo "   - Try: https://orcid.org/0009-0005-3020-9694"

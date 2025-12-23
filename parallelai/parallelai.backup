@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+"""
+ParallelAI Command Line Interface
+"""
+
+import asyncio
+import sys
+from src.real_swarm import WorkingSwarm
+
+async def main():
+    if len(sys.argv) < 2:
+        print("Usage: parallelai \"your query here\"")
+        print("Example: parallelai \"Explain blockchain technology\"")
+        sys.exit(1)
+    
+    query = " ".join(sys.argv[1:])
+    
+    print(f"\n🔍 Query: {query}")
+    print("🔄 Querying APIs in parallel...\n")
+    
+    swarm = WorkingSwarm()
+    results = await swarm.query_all(query)
+    
+    print("=" * 60)
+    for name, result in results.items():
+        if result["success"]:
+            print(f"\n✅ {name.upper()}:")
+            print("-" * 40)
+            print(result["response"])
+        else:
+            print(f"\n❌ {name.upper()}: {result['error']}")
+    print("=" * 60)
+
+if __name__ == "__main__":
+    asyncio.run(main())
