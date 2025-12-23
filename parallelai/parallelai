@@ -1,0 +1,149 @@
+#!/usr/bin/env python3
+"""
+ParallelAI Command Line Interface
+Main entry point for the ParallelAI Swarm system
+"""
+import sys
+import asyncio
+import click
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent))
+
+from src.parallelai.key_manager import (
+    load_keys, save_keys, set_api_key, 
+    setup_interactive, list_keys, get_key
+)
+from src.real_swarm import WorkingSwarm
+
+@click.group()
+def cli():
+    """ParallelAI Swarm - Multi-LLM Research Platform"""
+    pass
+
+@cli.command()
+@click.argument('query', required=True)
+@click.option('--provider', '-p', help='Specific provider to use')
+@click.option('--all', '-a', is_flag=True, help='Query all available providers')
+def query(query, provider, all):
+    """Query AI providers with your question"""
+    
+    if not query:
+        click.echo("❌ Please provide a query")
+        return
+    
+    # Load keys to check availability
+    keys = load_keys()
+    
+    if provider:
+        # Query specific provider
+        if provider not in keys or not keys[provider]:
+            click.echo(f"❌ {provider.upper()} API key not configured. Run 'parallelai keys setup'")
+            return
+        
+        click.echo(f"🔍 Querying {provider.upper()}...")
+        
+        async def query_single():
+            async with WorkingSwarm() as swarm:
+                result = await swarm.query_specific(provider, query)
+                
+                if result.get("success"):
+                    click.echo(f"\n✅ {provider.upper()}:")
+                    click.echo(f"📦 Model: {result.get('model', 'Unknown')}")
+                    click.echo(f"📝 Response:")
+                    click.echo("-" * 50)
+                    click.echo(result["response"])
+                    click.echo("-" * 50)
+                    
+                    if result.get("usage"):
+                        usage = result["usage"]
+                        click.echo(f"📊 Usage: {usage.get('total_tokens', 'N/A')} tokens")
+                else:
+                    click.echo(f"❌ {provider.upper()}: {result.get('error', 'Unknown error')}")
+        
+        asyncio.run(query_single())
+    
+    elif all:
+        # Query all available providers
+        available = [p for p in keys if keys[p]]
+        
+        if not available:
+            click.echo("❌ No API keys configured. Run 'parallelai keys setup'")
+            return
+        
+        click.echo(f"🚀 Querying {len(available)} providers...")
+        
+        async def query_all():
+            async with WorkingSwarm() as swarm:
+                results = await swarm.query_all(query)
+                
+                for provider, result in results.items():
+                    click.echo(f"\n{'='*60}")
+                    if result.get("success"):
+                        click.echo(f"✅ {provider.upper()}:")
+                        click.echo(f"📦 Model: {result.get('model', 'Unknown')}")
+                        click.echo(f"📝 Response:")
+                        click.echo("-" * 40)
+                        click.echo(result["response"][:500] + ("..." if len(result["response"]) > 500 else ""))
+                        click.echo("-" * 40)
+                    else:
+                        click.echo(f"❌ {provider.upper()}: {result.get('error', 'Unknown error')}")
+        
+        asyncio.run(query_all())
+    
+    else:
+        # Query all providers by default (same as --all)
+        available = [p for p in keys if keys[p]]
+        
+        if not available:
+            click.echo("❌ No API keys configured. Run 'parallelai keys setup'")
+            return
+        
+        click.echo(f"🚀 Querying {len(available)} providers...")
+        
+        async def query_all():
+            async with WorkingSwarm() as swarm:
+                results = await swarm.query_all(query)
+                
+                for provider, result in results.items():
+                    click.echo(f"\n{'='*60}")
+                    if result.get("success"):
+                        click.echo(f"✅ {provider.upper()}:")
+                        click.echo(f"📦 Model: {result.get('model', 'Unknown')}")
+                        click.echo(f"📝 Response:")
+                        click.echo("-" * 40)
+                        click.echo(result["response"][:500] + ("..." if len(result["response"]) > 500 else ""))
+                        click.echo("-" * 40)
+                    else:
+                        click.echo(f"❌ {provider.upper()}: {result.get('error', 'Unknown error')}")
+        
+        asyncio.run(query_all())
+
+@cli.group()
+def keys():
+    """Manage API keys"""
+    pass
+
+@keys.command(name='setup')
+def keys_setup():
+    """Interactive API key setup"""
+    setup_interactive()
+
+@keys.command(name='list')
+@click.option('--show-full', is_flag=True, help='Show full API keys (not recommended)')
+def keys_list(show_full):
+    """List configured API keys"""
+    list_keys(show_full)
+
+@keys.command(name='set')
+@click.argument('provider')
+@click.argument('key')
+def keys_set(provider, key):
+    """Set a specific API key"""
+    if set_api_key(provider, key):
+        click.echo(f"✅ {provider} key saved")
+    else:
+        click.echo(f"❌ Failed to save {provider} key")
+
+if __name__ == '__main__':
+    cli()
