@@ -1,0 +1,6 @@
+.parallelai/config
+.env
+*.env
+config
+*.key
+secrets*
